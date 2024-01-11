@@ -1,18 +1,14 @@
 from file_resource import MENU, resources
 
 
-resources = {
-    "water": 300,
-    "milk": 200,
-    "coffee": 100,
-}
-
-
 def report_machine(machine_resource):
     print("Machine Coffee Report")
-
+    list_item = [ ['',   '',   '',  '$'],
+                  ['ml', 'ml', 'g', '' ]]
+    k = 0
     for key, values in machine_resource.items():
-        print(f"  {key}: {values}")
+        print(f"  {key.title()}: {list_item[0][k]}{values}{list_item[1][k]}")
+        k += 1
 
 def check_resources_insufficient(machine_resource, name_coffee):
     dict_drink = MENU[name_coffee]["ingredients"]
@@ -23,13 +19,13 @@ def check_resources_insufficient(machine_resource, name_coffee):
             return True
     return False
 
-def check_and_receive_money(name_coffee, money_machine):
+def check_and_receive_money(name_coffee):
     money_need = MENU[name_coffee]["cost"]
 
     print(f"Please insert ${money_need}:")
     list_money_value = [0.25, 0.10, 0.05, 0.01]
     list_money_types = ["quartes", "dimes", "nickles", "pennies"]
-    total_insert = money_machine
+    total_insert = 0
     for i in range(len(list_money_types)):
         inserted = int(input(f"How many {list_money_types[i]}(${list_money_value[i]})? "))
         total_insert += inserted*list_money_value[i]
@@ -38,26 +34,30 @@ def check_and_receive_money(name_coffee, money_machine):
         print("Sorry that's not enough money. Money refunded.")
         return -1
 
-    return total_insert - money_need
+    if total_insert > money_need:
+        change = round(total_insert - money_need, 2)
+        print(f"Here is ${change} dollars in change.")
+    return money_need
 
 
 def make_coffee(machine_resource, name_coffee):
     dict_coffee = MENU[name_coffee]["ingredients"]
     for key, values in dict_coffee.items():
         machine_resource[key] -= values
+    print(f"Here is your {name_coffee}. Enjoy!")
 
 
 def produce_coffee(machine_resource, name_coffee):
     if check_resources_insufficient(machine_resource, name_coffee):
         return False
 
-    money_inserted = check_and_receive_money(name_coffee, machine_resource['money'])
+    money_inserted = check_and_receive_money(name_coffee)
     if money_inserted == -1:
         return False
 
     machine_resource['money'] += money_inserted
     print(f"The machine have ${machine_resource['money']} to future buy.")
-    make_coffee(name_coffee)
+    make_coffee(machine_resource, name_coffee)
     return True
 
 
